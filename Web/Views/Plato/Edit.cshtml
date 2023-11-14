@@ -1,0 +1,67 @@
+﻿@model Web.ViewModels.PlatoViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Editar el plato</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label">Descripción</label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="Imagem" class="control-label">Imagen</label>
+                <img src="~/images/@Model.Imagem.FileName" class="img-thumbnail" alt="@Model.Descripcion" />
+                <div class="custom-file">
+                    <input asp-for="Imagem" class="custom-file-input" id="customFile" type="file" accept=".jpg, .jpeg, .png" />
+                </div>
+                <span asp-validation-for="Imagem" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="ClasificacionComidaRefId" class="control-label">Clasificación</label>
+                <select asp-for="ClasificacionComidaRefId" class="form-control" asp-items="ViewBag.ClasificacionComidaRefId"></select>
+                <span asp-validation-for="ClasificacionComidaRefId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="DisponibilidadRefId" class="control-label">Disponibilidad</label>
+                <select asp-for="DisponibilidadRefId" class="form-control" asp-items="ViewBag.DisponibilidadRefId"></select>
+                <span asp-validation-for="DisponibilidadRefId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="TipoComidaRefId" class="control-label">Tipo de comida</label>
+                <select asp-for="TipoComidaRefId" class="form-control" asp-items="ViewBag.TipoComidaRefId"></select>
+                <span asp-validation-for="TipoComidaRefId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="PorcionRefId" class="control-label">Porción</label>
+                <select asp-for="PorcionRefId" class="form-control" asp-items="ViewBag.PorcionRefId"></select>
+                <span asp-validation-for="PorcionRefId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="Precio" class="control-label"></label>
+                <input asp-for="Precio" class="form-control" />
+                <span asp-validation-for="Precio" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="FechaRegistro" class="control-label">Fecha de registro</label>
+                <input asp-for="FechaRegistro" class="form-control" />
+                <span asp-validation-for="FechaRegistro" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Guardar cambios" class="btn btn-primary" /> |
+                <a asp-action="Index">Volver a la tabla</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

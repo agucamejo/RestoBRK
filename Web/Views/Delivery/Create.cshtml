@@ -1,0 +1,129 @@
+﻿@model Web.Models.Delivery
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="card">
+    <div class="card-header">
+        <b>Cargar pedido</b>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" id="form">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.ValidationError)</span>
+            <div class="form-row">
+                <h3>Productos del pedido</h3>
+                <div id="ProductosContainer" class="form-group col-md-6">
+                    @Html.EditorFor(model => model.Productos)
+                </div>
+            </div>
+            <div class="form-row mt-2">
+                <div class="form-group col-md-6">
+                    <input class="btn btn-success" type="button" id="btnAdd" value="+ Agregar productos" />
+                </div>
+            </div>
+            <div class="form-group col-md-6 mt-2">
+                <label asp-for="MetodoPagoRefId" class="control-label">Método de pago</label>
+                <select asp-for="MetodoPagoRefId" class ="form-control" asp-items="ViewBag.MetodoPagoRefId">
+                    <option value="">Seleccione un método de pago</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6 mt-2">
+                <label asp-for="PromocionRefId" class="control-label">Promociones</label>
+                <select asp-for="PromocionRefId" class ="form-control" asp-items="ViewBag.PromocionRefId">
+                    <option value="">Seleccione una promoción</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6 mt-2">
+                <label asp-for="NombreCliente" class="control-label">Cliente</label>
+                <input asp-for="NombreCliente" class="form-control" />
+                <span asp-validation-for="NombreCliente" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6 mt-2">
+                <label asp-for="DireccionCliente" class="control-label">Dirección</label>
+                <input asp-for="DireccionCliente" class="form-control" />
+                <span asp-validation-for="DireccionCliente" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-md-6 mt-2 d-none">
+                <input asp-for="PrecioPedido" id="PrecioPedido" class="form-control" />
+            </div>
+
+            <br>
+            <div class="d-flex justify-content-center">
+                &nbsp;<input type="submit" value="Crear" id="submit" class="btn btn-primary mt-2" /> &nbsp;
+                <a class="btn btn-info mt-2" asp-action="Index">Volver a la tabla</a> &nbsp;
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+
+        // Variable global para almacenar el total de precios
+        var totalPrecios = 0;
+
+        $("#btnAdd").on('click', function () {
+            var listaPrecioId = $("#ListaPrecioRefId").val();
+
+            $.ajax({
+                async: true,
+                type: "GET",
+                url: '/Delivery/GetPrecioProducto',
+                data: { listaPrecioId: listaPrecioId },
+                success: function (precioProducto) {
+                    // Realiza alguna acción si es necesario con el precio del producto obtenido
+                }
+            });
+
+            $.ajax({
+                async: true,
+                data: $('#form').serialize(),
+                type: "POST",
+                url: '/Delivery/AddProducto',
+                success: function (partialView) {
+                    $('#ProductosContainer').html(partialView);
+                }
+            });
+        });
+
+        $("#submit").on('click', function () {
+            try {
+                // Reinicia la variable totalPrecios antes de calcular el total
+                totalPrecios = 0;
+
+                // Obtén las opciones seleccionadas
+                var opcionesSeleccionadas = $("#ProductosContainer option:selected");
+
+                // Itera sobre las opciones seleccionadas y suma los precios
+                opcionesSeleccionadas.each(function () {
+                    var precioTexto = $(this).text().split('-')[1].trim();
+                    var precioFloat = parseFloat(precioTexto);
+                    if (!isNaN(precioFloat)) {
+                        totalPrecios += precioFloat;
+                    }
+                });
+
+                // Asigna el total de precios a PrecioPedido
+                $("#PrecioPedido").val(totalPrecios);
+
+                // Continuar con el envío del formulario
+                return true;
+            } catch (error) {
+                console.error("Error al calcular el precio total del pedido: " + error);
+                // Evitar el envío del formulario en caso de error
+                return false;
+            }
+        });
+
+    </script>
+}
+
+
+

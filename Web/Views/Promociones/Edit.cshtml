@@ -1,0 +1,59 @@
+﻿@model Web.Models.Promociones
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Editar promoción</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label">Descripción</label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="ListaPreciosRefId" class="control-label">Producto</label>
+                <select asp-for="ListaPreciosRefId" class="form-control" asp-items="ViewBag.ListaPreciosRefId"></select>
+                <span asp-validation-for="ListaPreciosRefId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="MetodoPagoRefId" class="control-label">Método de pago</label>
+                <select asp-for="MetodoPagoRefId" class="form-control" asp-items="ViewBag.MetodoPagoRefId"></select>
+                <span asp-validation-for="MetodoPagoRefId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="MontoVariacionRefId" class="control-label">Monto de variación</label>
+                <select asp-for="MontoVariacionRefId" class="form-control" asp-items="ViewBag.MontoVariacionRefId"></select>
+                <span asp-validation-for="MontoVariacionRefId" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="TarifaPrecio" class="control-label">Precio</label>
+                <input asp-for="TarifaPrecio" class="form-control" />
+                <span asp-validation-for="TarifaPrecio" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="ValidoHasta" class="control-label">Valido hasta</label>
+                <input asp-for="ValidoHasta" class="form-control" />
+                <span asp-validation-for="ValidoHasta" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label asp-for="FechaRegistro" class="control-label">Fecha de registro</label>
+                <input asp-for="FechaRegistro" class="form-control" />
+                <span asp-validation-for="FechaRegistro" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Guardar cambios" class="btn btn-primary" /> |
+                <a asp-action="Index">Volver a la tabla</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

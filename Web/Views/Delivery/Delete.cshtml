@@ -1,0 +1,90 @@
+﻿@model Web.Models.Delivery
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<div class="card">
+    <div class="card-header">
+        <b>Eliminar el pedido</b>
+    </div>
+    <div class="card-body">
+        <form id="form">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input asp-for="NumberOfProductos" type="hidden" id="numberOfProductos" />
+            <span class="text-danger">@Html.ValidationMessageFor(m => m.ValidationError)</span>
+
+            <h4>¿Está seguro que desea eliminar este pedido? </h4>
+            <div class="form-row">
+                <h5>Productos del pedido</h5>
+                <div id="ProductosContainer" class="form-group col-md-6">
+                    @Html.EditorFor(model => model.Productos, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group mt-2 col-md-6">
+                    <label asp-for="MetodoPagoRefId" class="control-label">Método de pago</label>
+                    <select asp-for="MetodoPagoRefId" class="form-control" asp-items="ViewBag.MetodoPagoRefId">
+                        <option value="">Seleccione un método de pago</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group mt-2 col-md-6">
+                    <label asp-for="PromocionRefId" class="control-label">Promociones</label>
+                    <select asp-for="PromocionRefId" class="form-control" asp-items="ViewBag.PromocionRefId">
+                        <option value="">Seleccione una promoción</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group mt-2 col-md-6">
+                    <label asp-for="NombreCliente" class="control-label">Cliente</label>
+                    <input asp-for="NombreCliente" class="form-control" />
+                    <span asp-validation-for="NombreCliente" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group mt-2 col-md-6">
+                    <label asp-for="DireccionCliente" class="control-label">Dirección</label>
+                    <input asp-for="DireccionCliente" class="form-control" />
+                    <span asp-validation-for="DireccionCliente" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group mt-2 col-md-6">
+                    <label asp-for="PrecioPedido" class="control-label">Precio del pedido</label>
+                    <input asp-for="PrecioPedido" class="form-control" />
+                    <span asp-validation-for="PrecioPedido" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group mt-2 col-md-6">
+                    <label asp-for="FechaRegistro" class="control-label">Fecha de registro</label>
+                    <input asp-for="FechaRegistro" class="form-control" />
+                    <span asp-validation-for="FechaRegistro" class="text-danger"></span>
+                </div>
+            </div>
+        </form>
+
+        <br>
+        <form asp-action="Delete">
+            <div class="d-flex justify-content-center">
+                <input type="hidden" asp-for="Id" />
+                &nbsp;<input type="submit" value="Borrar" class="btn btn-danger" /> &nbsp;
+                <a class="btn btn-info" asp-action="Index">Volver</a>&nbsp;
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+        $(function () { $('#form :input').attr("disabled", true); });
+    </script>
+}
