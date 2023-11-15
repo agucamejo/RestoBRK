@@ -1,23 +1,22 @@
-﻿@model Web.Models.Delivery
+﻿@model Web.Models.TakeAway
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Details";
 }
 
 <div class="card">
     <div class="card-header">
-        <b>Eliminar el pedido</b>
+        <b>Detalles del pedido</b>
     </div>
-    <div class="card-body">
-        <form id="form">
+    <div class="card-body"> 
+        <form asp-action="Edit" id="form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <input asp-for="NumberOfProductos" type="hidden" id="numberOfProductos" />
             <span class="text-danger">@Html.ValidationMessageFor(m => m.ValidationError)</span>
 
-            <h4>¿Está seguro que desea eliminar este pedido? </h4>
             <div class="form-row">
-                <h5>Productos del pedido</h5>
+                <h3>Productos del pedido</h3>
                 <div id="ProductosContainer" class="form-group">
                     @Html.EditorFor(model => model.Productos, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                 </div>
@@ -47,9 +46,9 @@
             </div>
             <div class="form-row">
                 <div class="form-group mt-2 col-md-6">
-                    <label asp-for="DireccionCliente" class="control-label">Dirección</label>
-                    <input asp-for="DireccionCliente" class="form-control" />
-                    <span asp-validation-for="DireccionCliente" class="text-danger"></span>
+                    <label asp-for="HorarioEntrega" class="control-label"></label>
+                    <input asp-for="HorarioEntrega" class="form-control" />
+                    <span asp-validation-for="HorarioEntrega" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-row">
@@ -66,19 +65,15 @@
                     <span asp-validation-for="FechaRegistro" class="text-danger"></span>
                 </div>
             </div>
-        </form>
 
-        <br>
-        <form asp-action="Delete">
+            <br>
             <div class="d-flex justify-content-center">
-                <input type="hidden" asp-for="Id" />
-                &nbsp;<input type="submit" value="Borrar" class="btn btn-danger" /> &nbsp;
+                &nbsp;<a class="btn btn-primary btn-volver" asp-action="Edit" asp-route-id="@Model?.Id">Editar</a>&nbsp;
                 <a class="btn btn-info btn-volver" asp-action="Index">Volver</a>&nbsp;
             </div>
         </form>
     </div>
 </div>
-
 
 @section Scripts {
     @{

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web.Data;
 
@@ -11,9 +12,11 @@ using Web.Data;
 namespace Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231114234241_createMesasModel")]
+    partial class createMesasModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -544,13 +547,7 @@ namespace Web.Migrations
                     b.Property<int>("ListaPrecioRefId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MesaId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("MesasId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TakeAwayId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -560,8 +557,6 @@ namespace Web.Migrations
                     b.HasIndex("ListaPrecioRefId");
 
                     b.HasIndex("MesasId");
-
-                    b.HasIndex("TakeAwayId");
 
                     b.ToTable("ProductosPedido");
                 });
@@ -607,43 +602,6 @@ namespace Web.Migrations
                     b.HasIndex("MontoVariacionRefId");
 
                     b.ToTable("Promociones");
-                });
-
-            modelBuilder.Entity("Web.Models.TakeAway", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("FechaRegistro")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("HorarioEntrega")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MetodoPagoRefId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NombreCliente")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("PrecioPedido")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<int?>("PromocionRefId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MetodoPagoRefId");
-
-                    b.HasIndex("PromocionRefId");
-
-                    b.ToTable("TakeAway");
                 });
 
             modelBuilder.Entity("Web.Models.Tamano", b =>
@@ -861,10 +819,6 @@ namespace Web.Migrations
                         .WithMany("Productos")
                         .HasForeignKey("MesasId");
 
-                    b.HasOne("Web.Models.TakeAway", null)
-                        .WithMany("Productos")
-                        .HasForeignKey("TakeAwayId");
-
                     b.Navigation("ListaPrecio");
                 });
 
@@ -889,34 +843,12 @@ namespace Web.Migrations
                     b.Navigation("MontoVariacion");
                 });
 
-            modelBuilder.Entity("Web.Models.TakeAway", b =>
-                {
-                    b.HasOne("Web.Models.MetodoPago", "MetodoPago")
-                        .WithMany()
-                        .HasForeignKey("MetodoPagoRefId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Web.Models.Promociones", "Promocion")
-                        .WithMany()
-                        .HasForeignKey("PromocionRefId");
-
-                    b.Navigation("MetodoPago");
-
-                    b.Navigation("Promocion");
-                });
-
             modelBuilder.Entity("Web.Models.Delivery", b =>
                 {
                     b.Navigation("Productos");
                 });
 
             modelBuilder.Entity("Web.Models.Mesas", b =>
-                {
-                    b.Navigation("Productos");
-                });
-
-            modelBuilder.Entity("Web.Models.TakeAway", b =>
                 {
                     b.Navigation("Productos");
                 });

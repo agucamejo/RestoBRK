@@ -14,7 +14,7 @@
             <span class="text-danger">@Html.ValidationMessageFor(m => m.ValidationError)</span>
             <div class="form-row">
                 <h3>Productos del pedido</h3>
-                <div id="ProductosContainer" class="form-group col-md-6">
+                <div id="ProductosContainer" class="form-group">
                     @Html.EditorFor(model => model.Productos)
                 </div>
             </div>
@@ -53,7 +53,7 @@
             <br>
             <div class="d-flex justify-content-center">
                 &nbsp;<input type="submit" value="Crear" id="submit" class="btn btn-primary mt-2" /> &nbsp;
-                <a class="btn btn-info mt-2" asp-action="Index">Volver a la tabla</a> &nbsp;
+                <a class="btn btn-info mt-2 btn-volver" asp-action="Index">Volver a la tabla</a> &nbsp;
             </div>
         </form>
     </div>
@@ -66,7 +66,6 @@
     }
     <script type="text/javascript">
 
-        // Variable global para almacenar el total de precios
         var totalPrecios = 0;
 
         $("#btnAdd").on('click', function () {
@@ -78,7 +77,7 @@
                 url: '/Delivery/GetPrecioProducto',
                 data: { listaPrecioId: listaPrecioId },
                 success: function (precioProducto) {
-                    // Realiza alguna acción si es necesario con el precio del producto obtenido
+
                 }
             });
 
@@ -95,13 +94,11 @@
 
         $("#submit").on('click', function () {
             try {
-                // Reinicia la variable totalPrecios antes de calcular el total
+
                 totalPrecios = 0;
 
-                // Obtén las opciones seleccionadas
                 var opcionesSeleccionadas = $("#ProductosContainer option:selected");
 
-                // Itera sobre las opciones seleccionadas y suma los precios
                 opcionesSeleccionadas.each(function () {
                     var precioTexto = $(this).text().split('-')[1].trim();
                     var precioFloat = parseFloat(precioTexto);
@@ -110,14 +107,12 @@
                     }
                 });
 
-                // Asigna el total de precios a PrecioPedido
                 $("#PrecioPedido").val(totalPrecios);
 
-                // Continuar con el envío del formulario
                 return true;
             } catch (error) {
                 console.error("Error al calcular el precio total del pedido: " + error);
-                // Evitar el envío del formulario en caso de error
+
                 return false;
             }
         });

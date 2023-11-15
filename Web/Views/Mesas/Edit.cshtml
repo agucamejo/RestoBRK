@@ -1,4 +1,4 @@
-﻿@model Web.Models.Delivery
+﻿@model Web.Models.Mesas
 
 @{
     ViewData["Title"] = "Edit";
@@ -42,19 +42,11 @@
             </div>
             <div class="form-row">
                 <div class="form-group mt-2 col-md-6">
-                    <label asp-for="NombreCliente" class="control-label">Cliente</label>
-                    <input asp-for="NombreCliente" class="form-control" />
-                    <span asp-validation-for="NombreCliente" class="text-danger"></span>
+                    <label asp-for="NroMesa" class="control-label"></label>
+                    <input asp-for="NroMesa" class="form-control" />
+                    <span asp-validation-for="NroMesa" class="text-danger"></span>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group mt-2 col-md-6">
-                    <label asp-for="DireccionCliente" class="control-label">Dirección del cliente</label>
-                    <input asp-for="DireccionCliente" class="form-control" />
-                    <span asp-validation-for="DireccionCliente" class="text-danger"></span>
-                </div>
-            </div>
-            
             <div class="form-group col-md-6 mt-2 d-none">
                 <input asp-for="PrecioPedido" id="PrecioPedido" class="form-control" />
             </div>
@@ -82,7 +74,7 @@
             $.ajax({
                 async: true,
                 type: "GET",
-                url: '/Delivery/GetPrecioProducto',
+                url: '/Mesas/GetPrecioProducto',
                 data: { listaPrecioId: listaPrecioId },
                 success: function (precioProducto) {
 
@@ -93,7 +85,7 @@
                 async: true,
                 data: $('#form').serialize(),
                 type: "POST",
-                url: '/Delivery/AddProducto',
+                url: '/Mesas/AddProducto',
                 success: function (partialView) {
                     $('#ProductosContainer').html(partialView);
                 }

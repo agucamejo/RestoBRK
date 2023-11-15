@@ -19,6 +19,12 @@ namespace Web.Models
         public int? DeliveryId { get; set; }
         [ForeignKey("DeliveryId")]
 
+        public int? MesaId { get; set; }
+        [ForeignKey("MesaId")]
+
+        public int? TakeAwayId { get; set; }
+        [ForeignKey("TakeAwayId")]
+
         public DateTime Created { get; set; } = DateTime.Now;
     }
 }

@@ -6,53 +6,50 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Web.Data;
-using Web.Migrations;
 using Web.Models;
 
 namespace Web.Controllers
 {
-    public class DeliveryController : Controller
+    public class TakeAwayController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public DeliveryController(ApplicationDbContext context)
+        public TakeAwayController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Delivery
+        // GET: TakeAway
         public async Task<IActionResult> Index(string search)
         {
-
-            var deliveries = await _context.Deliveries.ToListAsync();
+            var takeAways = await _context.TakeAways.ToListAsync();
 
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.Trim();
 
-                deliveries = deliveries
+                takeAways = takeAways
                     .Where(lp => lp.NombreCliente.Contains(search, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
-
-            return View(deliveries);
+            return View(takeAways);
         }
 
-        // GET: Delivery/Details/5
+        // GET: TakeAway/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            var model = new Delivery();
+            var model = new TakeAway();
             model.Productos.Add(new ProductosPedido());
 
-            if (id == null || _context.Deliveries == null)
+            if (id == null || _context.TakeAways == null)
             {
                 return NotFound();
             }
 
-            var delivery = await _context.Deliveries
-                .Include(d => d.MetodoPago)
-                .Include(d => d.Promocion)
-                .Include(d => d.Productos)
+            var takeAway = await _context.TakeAways
+                .Include(t => t.MetodoPago)
+                .Include(t => t.Promocion)
+                .Include(t => t.Productos)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             var promociones = _context.Promociones
@@ -64,13 +61,13 @@ namespace Web.Controllers
                });
 
             var producto = _context.ListaPrecios
-               .Select(x => new
-               {
-                   x.Id,
-                   ProductoPrecio = x.Producto + " - " + x.Precio
-               });
+              .Select(x => new
+              {
+                  x.Id,
+                  ProductoPrecio = x.Producto + " - " + x.Precio
+              });
 
-            if (delivery == null)
+            if (takeAway == null)
             {
                 return NotFound();
             }
@@ -79,13 +76,13 @@ namespace Web.Controllers
             ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion");
             ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo");
 
-            return View(delivery);
+            return View(takeAway);
         }
 
-        // GET: Delivery/Create
+        // GET: TakeAway/Create
         public IActionResult Create()
         {
-            var model = new Delivery();
+            var model = new TakeAway();
             model.Productos.Add(new ProductosPedido());
 
             var promociones = _context.Promociones
@@ -106,21 +103,22 @@ namespace Web.Controllers
             ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio");
             ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion");
             ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo");
+
             return View(model);
         }
 
-        // POST: Delivery/Create
+        // POST: TakeAway/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Productos,MetodoPagoRefId,PromocionRefId,NombreCliente,DireccionCliente,PrecioPedido,FechaRegistro")] Delivery delivery)
+        public async Task<IActionResult> Create([Bind("Id,Productos,MetodoPagoRefId,HorarioEntrega,PromocionRefId,NombreCliente,PrecioPedido,FechaRegistro")] TakeAway takeAway)
         {
             var coincideMetodoPromocion = true;
-            if (delivery.PromocionRefId.HasValue)
+            if (takeAway.PromocionRefId.HasValue)
             {
-                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(delivery.MetodoPagoRefId)).FirstOrDefault();
-                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(delivery.PromocionRefId)).FirstOrDefault();
+                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(takeAway.MetodoPagoRefId)).FirstOrDefault();
+                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(takeAway.PromocionRefId)).FirstOrDefault();
 
                 if (promocion != null)
                 {
@@ -147,9 +145,9 @@ namespace Web.Controllers
                    ProductoPrecio = x.Producto + " - " + x.Precio
                });
 
-            if (ModelState.IsValid && coincideMetodoPromocion) 
+            if (ModelState.IsValid && coincideMetodoPromocion)
             {
-                _context.Add(delivery);
+                _context.Add(takeAway);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -161,9 +159,10 @@ namespace Web.Controllers
 
 
             ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio");
-            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", delivery.MetodoPagoRefId);
-            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", delivery.PromocionRefId);
-            return View(delivery);
+            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", takeAway.MetodoPagoRefId);
+            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", takeAway.PromocionRefId);
+            
+            return View(takeAway);
         }
 
         [HttpGet]
@@ -177,13 +176,12 @@ namespace Web.Controllers
             return Json(precioProducto);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddProducto(Delivery delivery)
+        public async Task<ActionResult> AddProducto(TakeAway takeAway)
         {
 
-            delivery.Productos.Add(new ProductosPedido());
+            takeAway.Productos.Add(new ProductosPedido());
 
             var producto = _context.ListaPrecios
                .Select(x => new
@@ -194,39 +192,40 @@ namespace Web.Controllers
 
             ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio");
 
-            return PartialView("ProductosPedido", delivery);
+            return PartialView("ProductosPedido", takeAway);
         }
 
-        // GET: Delivery/Edit/5
+        // GET: TakeAway/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            var model = new Delivery();
+            var model = new TakeAway();
             model.Productos.Add(new ProductosPedido());
 
-            if (id == null || _context.Deliveries == null)
+            if (id == null || _context.TakeAways == null)
             {
                 return NotFound();
             }
 
-            var delivery = _context.Deliveries
+            var takeAway = _context.TakeAways
                 .Include(f => f.MetodoPago)
                 .Include(f => f.Promocion)
                 .Include(f => f.Productos)
                 .Where(x => x.Id.Equals(id))
-                .FirstOrDefault();
-            //var delivery = await _context.Deliveries.FindAsync(id);
-            if (delivery == null)
+                .FirstOrDefault(); 
+
+            //var takeAway = await _context.TakeAways.FindAsync(id);
+
+            if (takeAway == null)
             {
                 return NotFound();
             }
-
             var promociones = _context.Promociones
-               .Include(p => p.MetodoPago)
-               .Select(x => new
-               {
-                   x.Id,
-                   DescPromocionMetodo = x.Descripcion + " - " + x.MetodoPago.Descripcion
-               });
+              .Include(p => p.MetodoPago)
+              .Select(x => new
+              {
+                  x.Id,
+                  DescPromocionMetodo = x.Descripcion + " - " + x.MetodoPago.Descripcion
+              });
 
             var producto = _context.ListaPrecios
                .Select(x => new
@@ -235,30 +234,31 @@ namespace Web.Controllers
                    ProductoPrecio = x.Producto + " - " + x.Precio
                });
 
-            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", delivery);
-            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", delivery.MetodoPagoRefId);
-            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", delivery.PromocionRefId);
+            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", takeAway);
+            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", takeAway.MetodoPagoRefId);
+            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", takeAway.PromocionRefId);
             
-            return View(delivery);
+            return View(takeAway);
         }
 
-        // POST: Delivery/Edit/5
+
+        // POST: TakeAway/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Productos, MetodoPagoRefId,PromocionRefId,NombreCliente,DireccionCliente,PrecioPedido,FechaRegistro")] Delivery delivery)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Productos,MetodoPagoRefId,HorarioEntrega,PromocionRefId,NombreCliente,PrecioPedido,FechaRegistro")] TakeAway takeAway)
         {
-            if (id != delivery.Id)
+            if (id != takeAway.Id)
             {
                 return NotFound();
             }
 
             var coincideMetodoPromocion = true;
-            if (delivery.PromocionRefId.HasValue)
+            if (takeAway.PromocionRefId.HasValue)
             {
-                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(delivery.MetodoPagoRefId)).FirstOrDefault();
-                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(delivery.PromocionRefId)).FirstOrDefault();
+                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(takeAway.MetodoPagoRefId)).FirstOrDefault();
+                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(takeAway.PromocionRefId)).FirstOrDefault();
 
                 if (promocion != null)
                 {
@@ -274,15 +274,15 @@ namespace Web.Controllers
             {
                 try
                 {
-                    var productosPedido = _context.ProductosPedidos.Where(x => x.DeliveryId.Equals(delivery.Id));
+                    var productosPedido = _context.ProductosPedidos.Where(x => x.TakeAwayId.Equals(takeAway.Id));
                     _context.ProductosPedidos.RemoveRange(productosPedido);
 
-                    _context.Update(delivery);
+                    _context.Update(takeAway);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DeliveryExists(delivery.Id))
+                    if (!TakeAwayExists(takeAway.Id))
                     {
                         return NotFound();
                     }
@@ -314,18 +314,19 @@ namespace Web.Controllers
                    ProductoPrecio = x.Producto + " - " + x.Precio
                });
 
-            var promocionSelectedValue = delivery.PromocionRefId.HasValue ? delivery.PromocionRefId.Value.ToString() : null;
+            var promocionSelectedValue = takeAway.PromocionRefId.HasValue ? takeAway.PromocionRefId.Value.ToString() : null;
 
-            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", delivery);
-            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", delivery.MetodoPagoRefId);
-            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", delivery.PromocionRefId);
-            return View(delivery);
+            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", takeAway);
+            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", takeAway.MetodoPagoRefId);
+            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", takeAway.PromocionRefId);
+
+            return View(takeAway);
         }
 
-        // GET: Delivery/Delete/5
+        // GET: TakeAway/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Deliveries == null)
+            if (id == null || _context.TakeAways == null)
             {
                 return NotFound();
             }
@@ -350,47 +351,49 @@ namespace Web.Controllers
             ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion");
             ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo");
 
-            var delivery = await _context.Deliveries
-                .Include(d => d.MetodoPago)
-                .Include(d => d.Promocion)
-                .Include(d => d.Productos)
+            var takeAway = await _context.TakeAways
+                .Include(t => t.MetodoPago)
+                .Include(t => t.Promocion)
+                .Include(t => t.Productos)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (delivery == null)
+
+            if (takeAway == null)
             {
                 return NotFound();
             }
 
-            return View(delivery);
+            return View(takeAway);
         }
 
-        // POST: Delivery/Delete/5
+        // POST: TakeAway/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Deliveries == null)
+            if (_context.TakeAways == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Deliveries'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.TakeAways'  is null.");
             }
-            var delivery = await _context.Deliveries
-                .Include(d => d.Productos)
-                .Include(d => d.Promocion)
-                .Include(d => d.MetodoPago)
-                .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (delivery != null)
+            var takeAway = await _context.TakeAways
+                .Include(t => t.Productos)
+                .Include(t => t.Promocion)
+                .Include(t => t.MetodoPago)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (takeAway != null)
             {
-                _context.Deliveries.Remove(delivery);
-                _context.ProductosPedidos.RemoveRange(delivery.Productos);
+                _context.TakeAways.Remove(takeAway);
+                _context.ProductosPedidos.RemoveRange(takeAway.Productos);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DeliveryExists(int id)
+        private bool TakeAwayExists(int id)
         {
-          return (_context.Deliveries?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.TakeAways?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

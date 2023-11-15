@@ -42,6 +42,7 @@ button {
     border-color: #d3ac70 !important;
 }
 
-input{
+input,.btn-volver{
     margin-bottom: 0.5rem !important;
 }
+

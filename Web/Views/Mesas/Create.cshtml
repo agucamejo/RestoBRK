@@ -1,22 +1,20 @@
-﻿@model Web.Models.Delivery
+﻿@model Web.Models.Mesas
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Create";
 }
 
 <div class="card">
     <div class="card-header">
-        <b>Editar pedido</b>
+        <b>Cargar pedido</b>
     </div>
     <div class="card-body">
-        <form asp-action="Edit" id="form">
+        <form asp-action="Create" id="form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" id="numberOfTarifas" />
             <span class="text-danger">@Html.ValidationMessageFor(m => m.ValidationError)</span>
-
-            <div class="form-row">
+            <div class="form-row ">
                 <h3>Productos del pedido</h3>
-                <div id="ProductosContainer" class="form-group">
+                <div id="ProductosContainer" class="form-group mt-2">
                     @Html.EditorFor(model => model.Productos)
                 </div>
             </div>
@@ -25,48 +23,37 @@
                     <input class="btn btn-success" type="button" id="btnAdd" value="+ Agregar productos" />
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group mt-2 col-md-6">
-                    <label asp-for="MetodoPagoRefId" class="control-label">Método de pago</label>
-                    <select asp-for="MetodoPagoRefId" class="form-control" asp-items="ViewBag.MetodoPagoRefId"></select>
-                    <span asp-validation-for="MetodoPagoRefId" class="text-danger"></span>
-                </div>
+            <div class="form-group col-md-6 mt-2">
+                <label asp-for="MetodoPagoRefId" class="control-label">Método de pago</label>
+                <select asp-for="MetodoPagoRefId" class="form-control" asp-items="ViewBag.MetodoPagoRefId">
+                    <option value="">Seleccione un método de pago</option>
+                </select>
             </div>
-            <div class="form-row">
-                <div class="form-group mt-2 col-md-6">
-                    <label asp-for="PromocionRefId" class="control-label">Promoción</label>
-                    <select asp-for="PromocionRefId" class="form-control" asp-items="ViewBag.PromocionRefId">
-                        <option value="">Seleccione una promoción</option>
-                    </select>
-                </div>
+            <div class="form-group col-md-6 mt-2">
+                <label asp-for="PromocionRefId" class="control-label">Promociones</label>
+                <select asp-for="PromocionRefId" class="form-control" asp-items="ViewBag.PromocionRefId">
+                    <option value="">Seleccione una promoción</option>
+                </select>
             </div>
-            <div class="form-row">
-                <div class="form-group mt-2 col-md-6">
-                    <label asp-for="NombreCliente" class="control-label">Cliente</label>
-                    <input asp-for="NombreCliente" class="form-control" />
-                    <span asp-validation-for="NombreCliente" class="text-danger"></span>
-                </div>
+            <div class="form-group col-md-6 mt-2">
+                <label asp-for="NroMesa" class="control-label"></label>
+                <input asp-for="NroMesa" class="form-control" />
+                <span asp-validation-for="NroMesa" class="text-danger"></span>
             </div>
-            <div class="form-row">
-                <div class="form-group mt-2 col-md-6">
-                    <label asp-for="DireccionCliente" class="control-label">Dirección del cliente</label>
-                    <input asp-for="DireccionCliente" class="form-control" />
-                    <span asp-validation-for="DireccionCliente" class="text-danger"></span>
-                </div>
-            </div>
-            
+
             <div class="form-group col-md-6 mt-2 d-none">
                 <input asp-for="PrecioPedido" id="PrecioPedido" class="form-control" />
             </div>
 
             <br>
             <div class="d-flex justify-content-center">
-                &nbsp;<input type="submit" value="Guardar cambios" id="submit" class="btn btn-primary" />&nbsp;
-                <a class="btn btn-info ml-2 btn-volver" asp-action="Index">Volver a la tabla</a>&nbsp;
+                &nbsp;<input type="submit" value="Crear" id="submit" class="btn btn-primary mt-2" /> &nbsp;
+                <a class="btn btn-info mt-2 btn-volver" asp-action="Index">Volver a la tabla</a> &nbsp;
             </div>
         </form>
     </div>
 </div>
+            
 
 @section Scripts {
     @{
@@ -82,7 +69,7 @@
             $.ajax({
                 async: true,
                 type: "GET",
-                url: '/Delivery/GetPrecioProducto',
+                url: '/Mesas/GetPrecioProducto',
                 data: { listaPrecioId: listaPrecioId },
                 success: function (precioProducto) {
 
@@ -93,7 +80,7 @@
                 async: true,
                 data: $('#form').serialize(),
                 type: "POST",
-                url: '/Delivery/AddProducto',
+                url: '/Mesas/AddProducto',
                 success: function (partialView) {
                     $('#ProductosContainer').html(partialView);
                 }

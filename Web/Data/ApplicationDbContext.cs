@@ -26,6 +26,9 @@ namespace Web.Data
 
         public DbSet<Delivery> Deliveries { get; set; }
         public DbSet<ProductosPedido> ProductosPedidos { get; set; }
+        public DbSet<Mesas> Mesas { get; set; }
+        public DbSet<TakeAway> TakeAways { get; set; }
+
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //    => optionsBuilder.UseSqlServer("name=conexion");
 

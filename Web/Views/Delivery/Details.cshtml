@@ -18,7 +18,7 @@
 
             <div class="form-row">
                 <h3>Productos del pedido</h3>
-                <div id="ProductosContainer" class="form-group col-md-6">
+                <div id="ProductosContainer" class="form-group">
                     @Html.EditorFor(model => model.Productos, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                 </div>
             </div>
@@ -69,8 +69,8 @@
             
             <br>
             <div class="d-flex justify-content-center">
-                &nbsp;<a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model?.Id">Editar</a>&nbsp;
-                <a class="btn btn-info" asp-action="Index">Volver</a>&nbsp;
+                &nbsp;<a class="btn btn-primary btn-volver" asp-action="Edit" asp-route-id="@Model?.Id">Editar</a>&nbsp;
+                <a class="btn btn-info btn-volver" asp-action="Index">Volver</a>&nbsp;
             </div>
         </form>
     </div>

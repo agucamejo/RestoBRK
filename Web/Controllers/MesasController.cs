@@ -6,53 +6,41 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Web.Data;
-using Web.Migrations;
 using Web.Models;
 
 namespace Web.Controllers
 {
-    public class DeliveryController : Controller
+    public class MesasController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public DeliveryController(ApplicationDbContext context)
+        public MesasController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Delivery
-        public async Task<IActionResult> Index(string search)
+        // GET: Mesas
+        public async Task<IActionResult> Index()
         {
-
-            var deliveries = await _context.Deliveries.ToListAsync();
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                search = search.Trim();
-
-                deliveries = deliveries
-                    .Where(lp => lp.NombreCliente.Contains(search, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-
-            return View(deliveries);
+            var applicationDbContext = _context.Mesas.Include(m => m.MetodoPago).Include(m => m.Promocion);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Delivery/Details/5
+        // GET: Mesas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            var model = new Delivery();
+            var model = new Mesas();
             model.Productos.Add(new ProductosPedido());
 
-            if (id == null || _context.Deliveries == null)
+            if (id == null || _context.Mesas == null)
             {
                 return NotFound();
             }
 
-            var delivery = await _context.Deliveries
-                .Include(d => d.MetodoPago)
-                .Include(d => d.Promocion)
-                .Include(d => d.Productos)
+            var mesas = await _context.Mesas
+                .Include(m => m.MetodoPago)
+                .Include(m => m.Promocion)
+                .Include(m => m.Productos)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             var promociones = _context.Promociones
@@ -70,7 +58,7 @@ namespace Web.Controllers
                    ProductoPrecio = x.Producto + " - " + x.Precio
                });
 
-            if (delivery == null)
+            if (mesas == null)
             {
                 return NotFound();
             }
@@ -79,13 +67,13 @@ namespace Web.Controllers
             ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion");
             ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo");
 
-            return View(delivery);
+            return View(mesas);
         }
 
-        // GET: Delivery/Create
+        // GET: Mesas/Create
         public IActionResult Create()
         {
-            var model = new Delivery();
+            var model = new Mesas();
             model.Productos.Add(new ProductosPedido());
 
             var promociones = _context.Promociones
@@ -106,21 +94,22 @@ namespace Web.Controllers
             ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio");
             ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion");
             ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo");
+
             return View(model);
         }
 
-        // POST: Delivery/Create
+        // POST: Mesas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Productos,MetodoPagoRefId,PromocionRefId,NombreCliente,DireccionCliente,PrecioPedido,FechaRegistro")] Delivery delivery)
+        public async Task<IActionResult> Create([Bind("Id,Productos,MetodoPagoRefId,NroMesa,PromocionRefId,PrecioPedido,FechaRegistro")] Mesas mesas)
         {
             var coincideMetodoPromocion = true;
-            if (delivery.PromocionRefId.HasValue)
+            if (mesas.PromocionRefId.HasValue)
             {
-                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(delivery.MetodoPagoRefId)).FirstOrDefault();
-                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(delivery.PromocionRefId)).FirstOrDefault();
+                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(mesas.MetodoPagoRefId)).FirstOrDefault();
+                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(mesas.PromocionRefId)).FirstOrDefault();
 
                 if (promocion != null)
                 {
@@ -147,9 +136,9 @@ namespace Web.Controllers
                    ProductoPrecio = x.Producto + " - " + x.Precio
                });
 
-            if (ModelState.IsValid && coincideMetodoPromocion) 
+            if (ModelState.IsValid && coincideMetodoPromocion)
             {
-                _context.Add(delivery);
+                _context.Add(mesas);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -159,11 +148,11 @@ namespace Web.Controllers
                     ModelState.AddModelError("ValidationError", "El método de pago de la promoción no coincide con el elegido para abonar este pedido.");
             }
 
-
             ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio");
-            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", delivery.MetodoPagoRefId);
-            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", delivery.PromocionRefId);
-            return View(delivery);
+            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", mesas.MetodoPagoRefId);
+            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", mesas.PromocionRefId);
+           
+            return View(mesas);
         }
 
         [HttpGet]
@@ -180,10 +169,10 @@ namespace Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddProducto(Delivery delivery)
+        public async Task<ActionResult> AddProducto(Mesas mesas)
         {
 
-            delivery.Productos.Add(new ProductosPedido());
+            mesas.Productos.Add(new ProductosPedido());
 
             var producto = _context.ListaPrecios
                .Select(x => new
@@ -194,32 +183,32 @@ namespace Web.Controllers
 
             ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio");
 
-            return PartialView("ProductosPedido", delivery);
+            return PartialView("ProductosPedido", mesas);
         }
 
-        // GET: Delivery/Edit/5
+        // GET: Mesas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            var model = new Delivery();
+            var model = new Mesas();
             model.Productos.Add(new ProductosPedido());
 
-            if (id == null || _context.Deliveries == null)
+            if (id == null || _context.Mesas == null)
             {
                 return NotFound();
             }
 
-            var delivery = _context.Deliveries
+            //var mesas = await _context.Mesas.FindAsync(id);
+            var mesas = _context.Mesas
                 .Include(f => f.MetodoPago)
                 .Include(f => f.Promocion)
                 .Include(f => f.Productos)
                 .Where(x => x.Id.Equals(id))
                 .FirstOrDefault();
-            //var delivery = await _context.Deliveries.FindAsync(id);
-            if (delivery == null)
+
+            if (mesas == null)
             {
                 return NotFound();
             }
-
             var promociones = _context.Promociones
                .Include(p => p.MetodoPago)
                .Select(x => new
@@ -235,30 +224,30 @@ namespace Web.Controllers
                    ProductoPrecio = x.Producto + " - " + x.Precio
                });
 
-            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", delivery);
-            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", delivery.MetodoPagoRefId);
-            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", delivery.PromocionRefId);
+            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", mesas);
+            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", mesas.MetodoPagoRefId);
+            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", mesas.PromocionRefId);
             
-            return View(delivery);
+            return View(mesas);
         }
 
-        // POST: Delivery/Edit/5
+        // POST: Mesas/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Productos, MetodoPagoRefId,PromocionRefId,NombreCliente,DireccionCliente,PrecioPedido,FechaRegistro")] Delivery delivery)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Productos,MetodoPagoRefId,NroMesa,PromocionRefId,PrecioPedido,FechaRegistro")] Mesas mesas)
         {
-            if (id != delivery.Id)
+            if (id != mesas.Id)
             {
                 return NotFound();
             }
 
             var coincideMetodoPromocion = true;
-            if (delivery.PromocionRefId.HasValue)
+            if (mesas.PromocionRefId.HasValue)
             {
-                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(delivery.MetodoPagoRefId)).FirstOrDefault();
-                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(delivery.PromocionRefId)).FirstOrDefault();
+                var metodoPago = _context.MetodoPagos.Where(x => x.Id.Equals(mesas.MetodoPagoRefId)).FirstOrDefault();
+                var promocion = _context.Promociones.Include(p => p.MetodoPago).Where(x => x.Id.Equals(mesas.PromocionRefId)).FirstOrDefault();
 
                 if (promocion != null)
                 {
@@ -274,15 +263,15 @@ namespace Web.Controllers
             {
                 try
                 {
-                    var productosPedido = _context.ProductosPedidos.Where(x => x.DeliveryId.Equals(delivery.Id));
+                    var productosPedido = _context.ProductosPedidos.Where(x => x.MesaId.Equals(mesas.Id));
                     _context.ProductosPedidos.RemoveRange(productosPedido);
 
-                    _context.Update(delivery);
+                    _context.Update(mesas);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DeliveryExists(delivery.Id))
+                    if (!MesasExists(mesas.Id))
                     {
                         return NotFound();
                     }
@@ -314,18 +303,19 @@ namespace Web.Controllers
                    ProductoPrecio = x.Producto + " - " + x.Precio
                });
 
-            var promocionSelectedValue = delivery.PromocionRefId.HasValue ? delivery.PromocionRefId.Value.ToString() : null;
+            var promocionSelectedValue = mesas.PromocionRefId.HasValue ? mesas.PromocionRefId.Value.ToString() : null;
 
-            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", delivery);
-            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", delivery.MetodoPagoRefId);
-            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", delivery.PromocionRefId);
-            return View(delivery);
+            ViewData["ListaPrecioRefId"] = new SelectList(producto, "Id", "ProductoPrecio", mesas);
+            ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion", mesas.MetodoPagoRefId);
+            ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo", mesas.PromocionRefId);
+
+            return View(mesas);
         }
 
-        // GET: Delivery/Delete/5
+        // GET: Mesas/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Deliveries == null)
+            if (id == null || _context.Mesas == null)
             {
                 return NotFound();
             }
@@ -350,47 +340,48 @@ namespace Web.Controllers
             ViewData["MetodoPagoRefId"] = new SelectList(_context.MetodoPagos, "Id", "Descripcion");
             ViewData["PromocionRefId"] = new SelectList(promociones, "Id", "DescPromocionMetodo");
 
-            var delivery = await _context.Deliveries
-                .Include(d => d.MetodoPago)
-                .Include(d => d.Promocion)
-                .Include(d => d.Productos)
+            var mesas = await _context.Mesas
+                .Include(m => m.MetodoPago)
+                .Include(m => m.Promocion)
+                .Include(m => m.Productos)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (delivery == null)
+            if (mesas == null)
             {
                 return NotFound();
             }
 
-            return View(delivery);
+            return View(mesas);
         }
 
-        // POST: Delivery/Delete/5
+        // POST: Mesas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Deliveries == null)
+            if (_context.Mesas == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Deliveries'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.Mesas'  is null.");
             }
-            var delivery = await _context.Deliveries
-                .Include(d => d.Productos)
-                .Include(d => d.Promocion)
-                .Include(d => d.MetodoPago)
+
+            var mesas = await _context.Mesas
+                .Include(m => m.Productos)
+                .Include(m => m.Promocion)
+                .Include(m => m.MetodoPago)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (delivery != null)
+            if (mesas != null)
             {
-                _context.Deliveries.Remove(delivery);
-                _context.ProductosPedidos.RemoveRange(delivery.Productos);
+                _context.Mesas.Remove(mesas);
+                _context.ProductosPedidos.RemoveRange(mesas.Productos);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DeliveryExists(int id)
+        private bool MesasExists(int id)
         {
-          return (_context.Deliveries?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Mesas?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model Web.Models.Delivery
+﻿@model Web.Models.Mesas
 
 @{
     ViewData["Title"] = "Delete";
@@ -15,9 +15,8 @@
             <input asp-for="NumberOfProductos" type="hidden" id="numberOfProductos" />
             <span class="text-danger">@Html.ValidationMessageFor(m => m.ValidationError)</span>
 
-            <h4>¿Está seguro que desea eliminar este pedido? </h4>
             <div class="form-row">
-                <h5>Productos del pedido</h5>
+                <h3>Productos del pedido</h3>
                 <div id="ProductosContainer" class="form-group">
                     @Html.EditorFor(model => model.Productos, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                 </div>
@@ -38,18 +37,11 @@
                     </select>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="form-row"> 
                 <div class="form-group mt-2 col-md-6">
-                    <label asp-for="NombreCliente" class="control-label">Cliente</label>
-                    <input asp-for="NombreCliente" class="form-control" />
-                    <span asp-validation-for="NombreCliente" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group mt-2 col-md-6">
-                    <label asp-for="DireccionCliente" class="control-label">Dirección</label>
-                    <input asp-for="DireccionCliente" class="form-control" />
-                    <span asp-validation-for="DireccionCliente" class="text-danger"></span>
+                    <label asp-for="NroMesa" class="control-label"></label>
+                    <input asp-for="NroMesa" class="form-control" />
+                    <span asp-validation-for="NroMesa" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-row">
@@ -68,17 +60,16 @@
             </div>
         </form>
 
-        <br>
-        <form asp-action="Delete">
-            <div class="d-flex justify-content-center">
-                <input type="hidden" asp-for="Id" />
-                &nbsp;<input type="submit" value="Borrar" class="btn btn-danger" /> &nbsp;
+            <br>
+            <form asp-action="Delete">
+                <div class="d-flex justify-content-center">
+                    <input type="hidden" asp-for="Id" />
+                    &nbsp;<input type="submit" value="Borrar" class="btn btn-danger" /> &nbsp;
                 <a class="btn btn-info btn-volver" asp-action="Index">Volver</a>&nbsp;
-            </div>
-        </form>
+                </div>
+            </form>
     </div>
 </div>
-
 
 @section Scripts {
     @{

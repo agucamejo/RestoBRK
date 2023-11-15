@@ -1,4 +1,4 @@
-﻿@model Web.Models.Delivery
+﻿@model Web.Models.TakeAway
 
 @{
     ViewData["Title"] = "Delete";
@@ -47,9 +47,9 @@
             </div>
             <div class="form-row">
                 <div class="form-group mt-2 col-md-6">
-                    <label asp-for="DireccionCliente" class="control-label">Dirección</label>
-                    <input asp-for="DireccionCliente" class="form-control" />
-                    <span asp-validation-for="DireccionCliente" class="text-danger"></span>
+                    <label asp-for="HorarioEntrega" class="control-label"></label>
+                    <input asp-for="HorarioEntrega" class="form-control" />
+                    <span asp-validation-for="HorarioEntrega" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-row">
@@ -79,7 +79,6 @@
     </div>
 </div>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -88,3 +87,4 @@
         $(function () { $('#form :input').attr("disabled", true); });
     </script>
 }
+

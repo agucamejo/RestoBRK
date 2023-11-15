@@ -87,7 +87,7 @@ namespace Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Producto,Precio,FechaRegistro")] ListaPrecios listaPrecios)
+        public async Task<IActionResult> Create([Bind("Id,Producto,Precio,FechaRegistro")] ListaPrecio listaPrecios)
         {
             if (ModelState.IsValid)
             {
